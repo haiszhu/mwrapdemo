@@ -8,7 +8,7 @@ default: mexfile
 
 # How to compile your C library function: (-fPIC is needed for linking to MEX)
 lib.o: lib.c makefile
-	$(CC) -fPIC $(CFLAGS) -fopenmp -c lib.c
+	$(CC) -fPIC $(CFLAGS) $(OMPFLAGS) -c lib.c
 
 # Tell mwrap to make the interface and the name of the final MEX file:
 # (note -mb here makes separate .m file for each @ function in the .mw)
@@ -18,7 +18,7 @@ gateway.c: demo.mw makefile
 
 # How to make MATLAB/MEX compile the interface (whatever libs needed):
 mexfile: gateway.c lib.o makefile
-	$(MEX) gateway.c lib.o -largeArrayDims -lm -lgomp
+	$(MEX) gateway.c lib.o -largeArrayDims -lm $(OMPLIBS)$
 
 # Remove the MEX interface, MATLAB caller, and MEX file:
 clean:
