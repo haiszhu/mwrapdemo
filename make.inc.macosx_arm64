@@ -25,3 +25,6 @@ MWRAP = ../../mwrap/mwrap
 CFLAGS += -I/opt/homebrew/opt/libomp/include
 OMPFLAGS = -Xpreprocessor -fopenmp
 OMPLIBS = $(shell ls -d /Applications/MATLAB_R2022b_Beta.app)/toolbox/eml/externalDependency/omp/maca64/lib/libomp.dylib
+
+FDIR=$$(dirname `gfortran --print-file-name libgfortran.dylib`)
+MFLAGS += -L${FDIR}
