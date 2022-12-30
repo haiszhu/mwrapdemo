@@ -28,3 +28,6 @@ MWRAP =../../mwrap/mwrap
 
 OMPFLAGS = -fopenmp
 OMPLIBS = -L/usr/local/lib -lgomp
+
+FDIR=$$(dirname `gfortran --print-file-name libgfortran.dylib`)
+MFLAGS += -L${FDIR}
