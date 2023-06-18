@@ -1,33 +1,30 @@
-CC = gcc 
-FC = gfortran 
 
 include ../make.inc
 
 # Make sure the CC and FC compilers were built with the same glibc library
 # g77 will work fine on most systems
-CFLAGS = -Wall 
 
 default: lib int2-test mexfile
 
 OBJS = testdot.o testret.o testmat.o 
 
 int2-test : test.o testall.o $(OBJS) 
-	$(FC) -o int2-test test.o testall.o $(OBJS) libtest.a -L./ -ltest -lstdc++
+	$(FC) $(FFLAGS) -o int2-test test.o testall.o $(OBJS) libtest.a -L./ -ltest -lstdc++
 
 testret.o : testret.c   
-	$(CC) $(CFLAGS) -c testret.c  
+	$(CC) -fPIC $(CFLAGS) -c testret.c  
 
 testdot.o : testdot.c   
-	$(CC) $(CFLAGS) -c testdot.c  
+	$(CC) -fPIC $(CFLAGS) -c testdot.c  
 
 testmat.o : testmat.c   
-	$(CC) $(CFLAGS) -c testmat.c  
+	$(CC) -fPIC $(CFLAGS) -c testmat.c  
 
 testall.o : testall.f 
-	$(FC) -c testall.f 
+	$(FC) -fPIC $(FFLAGS) -c testall.f 
 
 test.o : test.f   
-	$(FC) -c test.f  
+	$(FC) -fPIC $(FFLAGS) -c test.f  
 
 gateway.c: demo.mw makefile
 	$(MWRAP) -c99complex -mex gateway -mb -list demo.mw
