@@ -10,4 +10,9 @@ fort.*
 *.a
 int2*
 make.inc
-
+gateway.c
+myfunc.m
+array2d.m
+array2domp.m
+/ccplx/
+/rootfinder/
