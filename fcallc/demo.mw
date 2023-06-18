@@ -1,0 +1,21 @@
+
+% --------------------------------------------------------------------------
+@function dot=testdot(n,vec1,vec2,dot)
+
+# FORTRAN testdot(int n, double[n] vec1, double[n] vec2, inout double[1] dot);
+
+% --------------------------------------------------------------------------
+@function mat=testret(mat)
+
+N = numel(mat);
+# FORTRAN testret(inout double[N] mat);
+
+% --------------------------------------------------------------------------
+@function mat3=testmat(n,m,mat1,mat2,mat3)
+
+n2 = n^2;
+nm = n*m;
+# FORTRAN testmat(int n, int m, double[n2] mat1, double[nm] mat2, inout double[nm] mat3);
+mat3 = reshape(mat3,n,m);
+
+

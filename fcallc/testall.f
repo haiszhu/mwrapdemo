@@ -6,7 +6,7 @@ c
         implicit none
         integer *4, intent(in) :: n
         real    *8, intent(in) :: vec1(*), vec2(*)
-        real    *8, intent(in) :: dot
+        real    *8, intent(inout) :: dot
       
         call testdot_c(n,vec1,vec2,dot)
 
@@ -17,9 +17,9 @@ c
 c
 */    
         implicit none
-				real    *8, intent(in) :: mat
+        real    *8, intent(in) :: mat
 
-				call testret_c(mat)
+        call testret_c(mat)
 
 			end subroutine testret
 
@@ -28,9 +28,9 @@ c
 c
 */    
         implicit none
-				integer *4, intent(in) :: n, m
-				real    *8, intent(in) :: mat1, mat2, mat3
+        integer *4, intent(in) :: n, m
+        real    *8, intent(in) :: mat1, mat2, mat3
 
-				call testmat_c(n,m,mat1,mat2,mat3)
+        call testmat_c(n,m,mat1,mat2,mat3)
 				
 			end subroutine testmat

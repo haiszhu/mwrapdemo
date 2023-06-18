@@ -1,13 +1,15 @@
 CC = gcc 
 FC = gfortran 
+
+include ../make.inc
+
 # Make sure the CC and FC compilers were built with the same glibc library
 # g77 will work fine on most systems
 CFLAGS = -Wall 
 
-OBJS = testdot.o testret.o testmat.o 
+default: lib int2-test mexfile
 
-all: lib int2-test
-# all: test lib 
+OBJS = testdot.o testret.o testmat.o 
 
 int2-test : test.o testall.o $(OBJS) 
 	$(FC) -o int2-test test.o testall.o $(OBJS) libtest.a -L./ -ltest -lstdc++
@@ -27,11 +29,19 @@ testall.o : testall.f
 test.o : test.f   
 	$(FC) -c test.f  
 
+gateway.c: demo.mw makefile
+	$(MWRAP) -c99complex -mex gateway -mb -list demo.mw
+	$(MWRAP) -c99complex -mex gateway -c gateway.c demo.mw
+
+mexfile: gateway.c testall.o makefile
+	$(MEX) gateway.c testall.o libtest.a -largeArrayDims $(MFLAGS) -lgfortran -lm -lstdc++
+
 # Default Targets for Cleaning up the Environment
 clean :
 	rm int2*  
 	rm *.o
 	rm *.a
+	rm testret.m testdot.m testmat.m
 
 pristine :
 	rm *.o
