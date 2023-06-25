@@ -1,7 +1,7 @@
 # the style of this makefile is not consistent with makefiles in other subfolders
 #
 
-all : libkernels.a kernels_fast.o int2-test gateway.c
+all : libkernels.a kernels_fast.o int2-test gateway.c mexfile
 
 libkernels.a : makefile
 	g++ -fPIC -Ofast -fopenmp -march=native -Wall -std=c++11  -DSCTL_PROFILE=-1  -I./SCTL/include -I./ -c ./libkernels.cpp -o ./SCTL/obj/libkernels.o
@@ -17,4 +17,9 @@ int2-test: makefile
 gateway.c: makefile
 	~/mwrap/mwrap -c99complex -mex gateway -mb -list demo.mw
 	~/mwrap/mwrap -c99complex -mex gateway -c gateway.c demo.mw
+
+FDIR=$$(dirname `gfortran --print-file-name libgfortran.dylib`)
+MFLAGS += -L${FDIR}
+mexfile: makefile
+	/Applications/MATLAB_R2021b.app/bin/mex gateway.c kernels_fast.o ./libkernels.a -largeArrayDims $(MFLAGS) -lgfortran -lm -lstdc++ -lgomp
 
