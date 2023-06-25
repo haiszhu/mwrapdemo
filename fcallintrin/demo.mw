@@ -1,0 +1,6 @@
+
+% --------------------------------------------------------------------------
+@function pot=h3ddirectcpnew(nd, zk, sources, charge, ns, ztarg, nt, thresh)
+
+pot = complex(zeros(nd,nt));
+# FORTRAN h3ddirectcpnew(int[1] nd, dcomplex[1] zk, double[3,ns] sources, dcomplex[nd,ns] charge, int[1] ns, double[3,nt] ztarg, int[1] nt, inout dcomplex[nd,nt] pot, double[1] thresh);
