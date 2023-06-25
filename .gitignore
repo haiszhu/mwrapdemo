@@ -14,5 +14,8 @@ gateway.c
 myfunc.m
 array2d.m
 array2domp.m
+testdot.m
+testret.m
+testmat.m
 /ccplx/
 /rootfinder/
