@@ -4,9 +4,10 @@
 # Barnett 8/3/15, tidied 8/26/22.
 
 # Change these if you want to use different compilers:
-CC = clang
+CC = gcc-13
+# CC = /opt/homebrew/opt/llvm/bin/clang
 FC = gfortran
-CFLAGS = -O3 -arch arm64
+CFLAGS = -arch arm64
 FFLAGS = $(CFLAGS)
 
 # Change this to location of MATLAB's command line mex executable:
@@ -23,8 +24,13 @@ MEX = /Applications/MATLAB_R20***.app/bin/mex
 MWRAP = ../../mwrap/mwrap
 
 CFLAGS += -I/opt/homebrew/opt/libomp/include
+# CFLAGS += -I/opt/homebrew/opt/llvm/include -fopenmp
 OMPFLAGS = -Xpreprocessor -fopenmp
-OMPLIBS = $(shell ls -d /Applications/MATLAB_R2022b_Beta.app)/toolbox/eml/externalDependency/omp/maca64/lib/libomp.dylib
+OMPLIBS = $(shell ls -d /Applications/MATLAB_R2023b.app)/toolbox/eml/externalDependency/omp/maca64/lib/libomp.dylib
+
+MATLABROOT=/Applications/MATLAB_R2023b.app
 
 FDIR=$$(dirname `gfortran --print-file-name libgfortran.dylib`)
 MFLAGS += -L${FDIR}
+MEX_LINK = gateway.mexmaca64
+MEX_LIBS = -I$(MATLABROOT)/extern/include -L$(MATLABROOT)/bin/maca64 -lmx -lmex -lmat -lm

@@ -2,11 +2,6 @@
 # Barnett 7/30/15. Nick Carriero no-MEX tweak, 3/12/19
 include ../make.inc
 
-MATLABROOT=/Applications/MATLAB_R2022b_Beta.app
-
-# brew install gfortran
-FC=/opt/homebrew/bin/gfortran
-
 # This is the task run if "make" is done with no arguments ("mexfile" is not
 # a file, just a name for a compilation task given below):
 default: mexfile
@@ -25,7 +20,7 @@ gateway.c: demo.mw makefile
 # This doesn't use mex. It sets appropriate include and library paths, and specifies needed libraries. See:
 # https://www.mathworks.com/matlabcentral/answers/377799-compiling-mex-files-without-the-mex-command
 mexfile: gateway.c lib.o makefile
-	$(FC) -o gateway.mexmaca64 -shared -fPIC -fopenmp -I$(MATLABROOT)/extern/include -DMATLAB_MEX_FILE -DMATLAB_DEFAULT_RELEASE=R2018a gateway.c lib.o -L$(MATLABROOT)/bin/maca64 -lmx -lmex -lmat -lm 
+	$(FC) -o $(MEX_LINK) -shared -fPIC -fopenmp -DMATLAB_MEX_FILE -DMATLAB_DEFAULT_RELEASE=R2018a gateway.c lib.o $(MEX_LIBS)
 
 # Remove the MEX interface, MATLAB caller, and MEX file:
 clean:
