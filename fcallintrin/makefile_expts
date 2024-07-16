@@ -9,7 +9,7 @@ default: mexfile
 OBJS = ckernels_expts.o kernels_expts.o 
 
 ckernels_expts.o : ckernels_expts.c   
-	$(CC) -fPIC $(CFLAGS) -mavx2 -c ckernels_expts.c
+	$(CC) -fPIC $(CFLAGS) -mavx512f -c ckernels_expts.c
 
 kernels_expts.o : kernels_expts.f 
 	$(FC) -fPIC $(FFLAGS) -c kernels_expts.f 

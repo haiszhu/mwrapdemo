@@ -16,3 +16,11 @@
       real    *8, intent(inout) :: A(*)
       call cavx2lap3ddlpmat_c(n,r0,m,r,A)  
       end subroutine cavx2lap3ddlpmat
+
+      subroutine cavx512lap3ddlpmat(n,r0,m,r,A)
+      implicit none
+      integer *8, intent(in) :: n, m
+      real    *8, intent(in) :: r0(*), r(*)
+      real    *8, intent(inout) :: A(*)
+      call cavx512lap3ddlpmat_c(n,r0,m,r,A)  
+      end subroutine cavx512lap3ddlpmat

@@ -50,8 +50,15 @@ A2=clap3ddlpmat_mex(m,r0,n,r,A2);
 A3 = zeros(m,n);
 A3=cavx2lap3ddlpmat_mex(m,r0,n,r,A3);
 
+% keyboard
+
+% c avx512
+A4 = zeros(m,n);
+A4=cavx512lap3ddlpmat_mex(m,r0,n,r,A4);
+
 % diff = abs(A - A2)
 diff2 = abs(A - A3)
+diff3 = abs(A - A4)
 
 m = 8001;
 r0 = rand(3,m);
@@ -64,6 +71,10 @@ toc
 A3 = zeros(m,n);
 tic
 A3=cavx2lap3ddlpmat_mex(m,r0,n,r,A3);
+toc
+A4 = zeros(m,n);
+tic
+A4=cavx512lap3ddlpmat_mex(m,r0,n,r,A4);
 toc
 
 keyboard
