@@ -1,8 +1,17 @@
+! rm -f *.o
+! gcc -mavx512f -mfma -c -o ckernels_expts.o ckernels_expts.c
+! gfortran -c -o kernels_expts.o kernels_expts.f
+! gfortran -c -o test_lap3d.o test_lap3d.f
+! gfortran -o test_lap3d test_lap3d.o kernels_expts.o ckernels_expts.o -lm
+! ./test_lap3d
+      
       program test_lap3d
       implicit none
       integer *8 :: m, n, nd
       ! real *8, allocatable :: r0(:,:), r(:,:), A(:,:)
       real *8, allocatable :: r0(:), r(:), A(:), A2(:), A3(:)
+      real *8, allocatable :: r0l(:), rl(:), Al(:), A2l(:), A3l(:)
+      real *8 :: start, finish
     
       ! Initialize dimensions
       m = 3
@@ -28,14 +37,19 @@
      1      10.0, 11.0, 12.0]
     
       ! Call the original C function
+      A = 1.0d0
       call clap3ddlpmat(m, r0, n, r, A)
       print *, "Results from clap3ddlpmat:"
       call print_matrix(m*n, A)
     
       ! Call the SIMD C function
+      A2 = 2.0d0
       call cavx2lap3ddlpmat(m, r0, n, r, A2)
       print *, "Results from cavx2lap3ddlpmat:"
       call print_matrix(m*n, A2)
+
+      ! A3 = A2 - A
+      ! call print_matrix(m*n, A3)
 
       ! Call the SIMD C function
       call cavx512lap3ddlpmat(m, r0, n, r, A3)
@@ -44,6 +58,39 @@
     
       ! Deallocate arrays
       deallocate(r0, r, A, A2, A3)
+
+      ! Initialize dimensions
+      m = 8001
+      n = 10000
+      nd = 3
+    
+      ! Allocate arrays
+      allocate(r0l(3*m), rl(3*n), Al(m*n), A2l(m*n), A3l(m*n))
+      r0l = 1.0d0
+      rl = 2.0d0
+
+      ! Call the pure C function
+      call cpu_time(start)
+      call clap3ddlpmat(m, r0l, n, rl, Al)
+      call cpu_time(finish)
+      print '("Time for clap3ddlpmat = ",f6.3," seconds.")',
+     1        finish-start
+
+      ! Call the SIMD C function
+      call cpu_time(start)
+      call cavx2lap3ddlpmat(m, r0l, n, rl, A2l)
+      call cpu_time(finish)
+      print '("Time for cavx2lap3ddlpmat = ",f6.3," seconds.")',
+     1        finish-start
+
+      ! Call the SIMD C function
+      call cpu_time(start)
+      call cavx512lap3ddlpmat(m, r0l, n, rl, A3l)
+      call cpu_time(finish)
+      print '("Time for cavx512lap3ddlpmat = ",f6.3," seconds.")',
+     1        finish-start
+
+      deallocate(r0l,rl,Al,A2l,A3l)
       
       contains
     

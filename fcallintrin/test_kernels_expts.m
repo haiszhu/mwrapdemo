@@ -10,7 +10,7 @@
 % ./test_lap3d
 % 
 % rm -f *.o
-% gcc -mavx512f -c -o ckernels_expts.o ckernels_expts.c
+% gcc -mavx512f -mfma -c -o ckernels_expts.o ckernels_expts.c
 % gfortran -c -o kernels_expts.o kernels_expts.f
 % gfortran -c -o test_lap3d.o test_lap3d.f
 % gfortran -o test_lap3d test_lap3d.o kernels_expts.o ckernels_expts.o -lm
@@ -75,6 +75,10 @@ toc
 A4 = zeros(m,n);
 tic
 A4=cavx512lap3ddlpmat_mex(m,r0,n,r,A4);
+toc
+A5 = zeros(m,n);
+tic
+A5=lap3ddlpmat_mex(m,r0,n,r,A5);
 toc
 
 keyboard
