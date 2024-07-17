@@ -6,11 +6,12 @@ extern "C" {
     }
 #endif
 
-#include <immintrin.h>
 #include <stdio.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <immintrin.h>
+
 // not actual dlp... just using the name... 
 void clap3ddlpmat_c_(  int64_t *M, double *r0, int64_t *N, double *r, double *A )
 {
@@ -39,6 +40,7 @@ void clap3ddlpmat_c_(  int64_t *M, double *r0, int64_t *N, double *r, double *A 
     }
   }
 }
+
 
 void cavx2lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) 
 {
@@ -89,6 +91,8 @@ void cavx2lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *
   free(r0z);
 }
 
+
+
 void cavx512lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) 
 {
   int64_t m, n, i, j, m8;
@@ -137,4 +141,3 @@ void cavx512lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double
   free(r0y);
   free(r0z);
 }
-
