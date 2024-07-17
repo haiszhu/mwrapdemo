@@ -16,23 +16,6 @@ else ifeq ($(ARCH), x86)
   CFLAGS += -mavx512f
 endif
 
-ifeq ($(ARCH), arm)
-
-ckernels_expts_arm.o : ckernels_expts_arm.c   
-	$(CC) -fPIC $(CFLAGS) -c ckernels_expts_arm.c
-
-kernels_expts_arm.o : kernels_expts_arm.f 
-	$(FC) -fPIC $(FFLAGS) -c kernels_expts_arm.f 
-
-gateway_expts.c: demo_expts_arm.mw makefile_expts
-	$(MWRAP) -c99complex -i8 -mex gateway_expts -mb -list demo_expts_arm.mw
-	$(MWRAP) -c99complex -i8 -mex gateway_expts -c gateway_expts.c demo_expts_arm.mw
-
-mexfile: gateway_expts.c ckernels_expts_arm.o kernels_expts_arm.o makefile_expts
-	$(MEX) gateway_expts.c ckernels_expts_arm.o kernels_expts_arm.o -largeArrayDims $(MFLAGS) -lgfortran -lm -lstdc++
-
-else ifeq ($(ARCH), x86)
-
 ckernels_expts.o : ckernels_expts.c   
 	$(CC) -fPIC $(CFLAGS) -c ckernels_expts.c
 
@@ -45,8 +28,6 @@ gateway_expts.c: demo_expts.mw makefile_expts
 
 mexfile: gateway_expts.c ckernels_expts.o kernels_expts.o makefile_expts
 	$(MEX) gateway_expts.c ckernels_expts.o kernels_expts.o -largeArrayDims $(MFLAGS) -lgfortran -lm -lstdc++
-
-endif
 
 # Default Targets for Cleaning up the Environment
 clean :

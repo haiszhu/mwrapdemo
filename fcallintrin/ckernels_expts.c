@@ -1,16 +1,30 @@
+// gcc -mavx512f -mfma -c -o ckernels_expts.o ckernels_expts.c
 #ifdef __cplusplus
 extern "C" {
     void clap3ddlpmat_c_( int64_t *M, double *r0, int64_t *N, double *r, double *A);
-    void cavx2lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A);
-    void cavx512lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A);
+    void csimd128lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A);
+    void csimd256lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A);
+    void csimd512lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A);
     }
+#endif
+
+// detect platform
+#if defined(__arm__) || defined(__aarch64__)
+  #define ARCH_ARM
+#elif defined(__x86_64__) || defined(_M_X64)
+  #if defined(__AVX2__)
+    #define ARCH_AVX2
+  #endif
+  #define ARCH_X86
+  #if defined(__AVX512F__)
+    #define ARCH_AVX512
+  #endif
 #endif
 
 #include <stdio.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <immintrin.h>
 
 // not actual dlp... just using the name... 
 void clap3ddlpmat_c_(  int64_t *M, double *r0, int64_t *N, double *r, double *A )
@@ -20,11 +34,11 @@ void clap3ddlpmat_c_(  int64_t *M, double *r0, int64_t *N, double *r, double *A 
   m = *M;
   n = *N;
   // 
-  double *r0x = (double*)aligned_alloc(32, m * sizeof(double));
-  double *r0y = (double*)aligned_alloc(32, m * sizeof(double));
-  double *r0z = (double*)aligned_alloc(32, m * sizeof(double));
+  double *r0x = (double*)aligned_alloc(8, m * sizeof(double));
+  double *r0y = (double*)aligned_alloc(8, m * sizeof(double));
+  double *r0z = (double*)aligned_alloc(8, m * sizeof(double));
   // 
-  for (int64_t i = 0; i < m; ++i) {
+  for (i = 0; i < m; ++i) {
     r0x[i] = r0[3*i];
     r0y[i] = r0[3*i+1];
     r0z[i] = r0[3*i+2];
@@ -39,10 +53,19 @@ void clap3ddlpmat_c_(  int64_t *M, double *r0, int64_t *N, double *r, double *A 
       A[m*j+i] = 1.0/sqrt(rr);
     }
   }
+  // Free allocated memory
+  free(r0x);
+  free(r0y);
+  free(r0z);
 }
 
+#ifdef ARCH_X86
+#include <immintrin.h>
 
-void cavx2lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) 
+void csimd128lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) {}
+
+#if defined(ARCH_AVX2)
+void csimd256lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) 
 {
   int64_t m, n, i, j, m4;
   m = *M;
@@ -90,10 +113,12 @@ void cavx2lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *
   free(r0y);
   free(r0z);
 }
+#else
+void csimd256lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) {}
+#endif
 
-
-
-void cavx512lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) 
+#ifdef ARCH_AVX512
+void csimd512lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) 
 {
   int64_t m, n, i, j, m8;
   m = *M;
@@ -141,3 +166,59 @@ void cavx512lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double
   free(r0y);
   free(r0z);
 }
+#else
+void csimd512lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) {}
+#endif
+
+#endif
+
+#ifdef ARCH_ARM
+#include <arm_neon.h>
+void csimd128lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) 
+{
+  int64_t m, n, i, j, m2;
+  m = *M;
+  n = *N;
+  m2 = (m/2)*2;
+
+  double *r0x = (double*)aligned_alloc(16, m2 * sizeof(double));
+  double *r0y = (double*)aligned_alloc(16, m2 * sizeof(double));
+  double *r0z = (double*)aligned_alloc(16, m2 * sizeof(double));
+
+  for (i = 0; i < m2; ++i) {
+    r0x[i] = r0[3*i];
+    r0y[i] = r0[3*i+1];
+    r0z[i] = r0[3*i+2];
+  }
+
+  for (j = 0; j < n; ++j) {
+    float64x2_t rx_v = vdupq_n_f64(r[3*j]);
+    float64x2_t ry_v = vdupq_n_f64(r[3*j+1]);
+    float64x2_t rz_v = vdupq_n_f64(r[3*j+2]);
+    float64x2_t ones_v = vdupq_n_f64(1.0);
+    for (i = 0; i <= m2 - 2; i += 2) {
+      float64x2_t r0x_v = vld1q_f64(&r0x[i]);
+      float64x2_t r0y_v = vld1q_f64(&r0y[i]);
+      float64x2_t r0z_v = vld1q_f64(&r0z[i]);
+      float64x2_t dx_v = vsubq_f64(r0x_v, rx_v);
+      float64x2_t dy_v = vsubq_f64(r0y_v, ry_v);
+      float64x2_t dz_v = vsubq_f64(r0z_v, rz_v);
+      float64x2_t rr_v = vaddq_f64(vaddq_f64(vmulq_f64(dx_v, dx_v), vmulq_f64(dy_v, dy_v)), vmulq_f64(dz_v, dz_v));
+      float64x2_t inv_sqrt_rr_v = vdivq_f64(ones_v, vsqrtq_f64(rr_v));
+      vst1q_f64(&A[i+j*m], inv_sqrt_rr_v);
+    }
+    for (i = m2; i < m; i++) {
+      double dx = r0[3*i]   - r[3*j];
+      double dy = r0[3*i+1] - r[3*j+1];
+      double dz = r0[3*i+2] - r[3*j+2];
+      double rr = dx*dx + dy*dy + dz*dz;
+      A[m*j+i]  = 1.0/sqrt(rr);
+    }
+  }
+  free(r0x);
+  free(r0y);
+  free(r0z);
+}
+void csimd256lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) {}
+void csimd512lap3ddlpmat_c_(int64_t *M, double *r0, int64_t *N, double *r, double *A) {}
+#endif

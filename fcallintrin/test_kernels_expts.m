@@ -1,20 +1,21 @@
 % start kernel experiments 101
-% make -f makefile_expts
+% make -f makefile_expts ARCH=X86
 % 07/15/24 Hai
 
-% rm -f *.o
-% gcc -mavx2 -c -o ckernels_expts.o ckernels_expts.c
-% gfortran -c -o kernels_expts.o kernels_expts.f
-% gfortran -c -o test_lap3d.o test_lap3d.f
-% gfortran -o test_lap3d test_lap3d.o kernels_expts.o ckernels_expts.o -lm
-% ./test_lap3d
-% 
-% rm -f *.o
-% gcc -mavx512f -mfma -c -o ckernels_expts.o ckernels_expts.c
-% gfortran -c -o kernels_expts.o kernels_expts.f
-% gfortran -c -o test_lap3d.o test_lap3d.f
-% gfortran -o test_lap3d test_lap3d.o kernels_expts.o ckernels_expts.o -lm
-% ./test_lap3d
+%%% outdated fortran test file
+% % rm -f *.o
+% % gcc -mavx2 -c -o ckernels_expts.o ckernels_expts.c
+% % gfortran -c -o kernels_expts.o kernels_expts.f
+% % gfortran -c -o test_lap3d.o test_lap3d.f
+% % gfortran -o test_lap3d test_lap3d.o kernels_expts.o ckernels_expts.o -lm
+% % ./test_lap3d
+% % 
+% % rm -f *.o
+% % gcc -mavx512f -mfma -c -o ckernels_expts.o ckernels_expts.c
+% % gfortran -c -o kernels_expts.o kernels_expts.f
+% % gfortran -c -o test_lap3d.o test_lap3d.f
+% % gfortran -o test_lap3d test_lap3d.o kernels_expts.o ckernels_expts.o -lm
+% % ./test_lap3d
 
 m = 5;
 r0 = reshape([1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, ...
@@ -48,13 +49,13 @@ A2=clap3ddlpmat_mex(m,r0,n,r,A2);
 
 % c avx2
 A3 = zeros(m,n);
-A3=cavx2lap3ddlpmat_mex(m,r0,n,r,A3);
+A3=csimd256lap3ddlpmat_mex(m,r0,n,r,A3);
 
 % keyboard
 
 % c avx512
 A4 = zeros(m,n);
-A4=cavx512lap3ddlpmat_mex(m,r0,n,r,A4);
+A4=csimd512lap3ddlpmat_mex(m,r0,n,r,A4);
 
 % diff = abs(A - A2)
 diff2 = abs(A - A3)
@@ -70,15 +71,11 @@ A2=clap3ddlpmat_mex(m,r0,n,r,A2);
 toc
 A3 = zeros(m,n);
 tic
-A3=cavx2lap3ddlpmat_mex(m,r0,n,r,A3);
+A3=csimd256lap3ddlpmat_mex(m,r0,n,r,A3);
 toc
 A4 = zeros(m,n);
 tic
-A4=cavx512lap3ddlpmat_mex(m,r0,n,r,A4);
-toc
-A5 = zeros(m,n);
-tic
-A5=lap3ddlpmat_mex(m,r0,n,r,A5);
+A4=csimd512lap3ddlpmat_mex(m,r0,n,r,A4);
 toc
 
 keyboard

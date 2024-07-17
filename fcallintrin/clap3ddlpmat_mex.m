@@ -8,5 +8,4 @@ mex_id_ = 'clap3ddlpmat(i int64_t[x], i double[x], i int64_t[x], i double[x], io
 A = reshape(A,n,m); 
 end
 
-
 % --------------------------------------------------------------------------
