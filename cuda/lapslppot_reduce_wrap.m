@@ -1,4 +1,4 @@
-function y = lapslppot_wrap(src, targ, x)
+function y = lapslppot_reduce_wrap(src, targ, x)
 
   % Basic size checks in MATLAB (mwrap does type checking, not shape logic)
   if size(src,1) ~= 3
@@ -17,13 +17,12 @@ function y = lapslppot_wrap(src, targ, x)
   % Allocate output on GPU (length M)
   y = gpuArray.zeros(M,1,'double');
 
-  % Call the CUDA entry point in lapslppot.cu
-  mex_id_ = 'c o int = lapslppot(g i double[], g i double[], g i double[], g io double[], c i int, c i int)';
+  % Call the CUDA entry point in lapslppot.cu (block-reduced kernel)
+  mex_id_ = 'c o int = lapslppot_reduce(g i double[], g i double[], g i double[], g io double[], c i int, c i int)';
 [ier, y] = utils_cu(mex_id_, src, targ, x, y, N, M);
 
   if ier ~= 0
-    error('lapslppot failed: ier=%d', ier);
+    error('lapslppot_reduce failed: ier=%d', ier);
   end
 
 end
-

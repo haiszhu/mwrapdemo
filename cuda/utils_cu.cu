@@ -43,7 +43,6 @@
 
 #include "utils_cu.h"
 
-
 /*
  * Records for call profile.
  */
@@ -1030,7 +1029,7 @@ mxWrapGetArrayDef_single(mxWrapGetArray_single_size_t, size_t)
 mxWrapCopyDef_single    (mxWrapCopy_single_size_t,     size_t)
 mxWrapReturnDef_single  (mxWrapReturn_single_size_t,   size_t)
 
-/* ---- utils_cu.mw: 26 ----
+/* ---- utils_cu.mw: 27 ----
  * int ier = lapslppot(gpu double[] src, gpu double[] targ, gpu double[] x, gpu inout double[] y, int N, int M);
  */
 static const char* stubids1_ = "c o int = lapslppot(g i double[], g i double[], g i double[], g io double[], c i int, c i int)";
@@ -1114,6 +1113,90 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
+/* ---- utils_cu.mw: 55 ----
+ * int ier = lapslppot_reduce(gpu double[] src, gpu double[] targ, gpu double[] x, gpu inout double[] y, int N, int M);
+ */
+static const char* stubids2_ = "c o int = lapslppot_reduce(g i double[], g i double[], g i double[], g io double[], c i int, c i int)";
+
+void mexStub2(int nlhs, mxArray* plhs[],
+              int nrhs, const mxArray* prhs[])
+{
+    const char* mw_err_txt_ = 0;
+    double*     in0_ =0; /* src        */
+    mxGPUArray const *mxGPUArray_in0_ =0; /* src        */
+    double*     in1_ =0; /* targ       */
+    mxGPUArray const *mxGPUArray_in1_ =0; /* targ       */
+    double*     in2_ =0; /* x          */
+    mxGPUArray const *mxGPUArray_in2_ =0; /* x          */
+    double*     in3_ =0; /* y          */
+    mxGPUArray const *mxGPUArray_in3_ =0; /* y          */
+    int         in4_;    /* N          */
+    int         in5_;    /* M          */
+    int         out0_;   /* ier        */
+
+    // extract input GPU array pointer
+    if(!(mxIsGPUArray(prhs[0])))
+        mw_err_txt_ = "Invalid array argument, gpuArray expected";
+    if (mw_err_txt_) goto mw_err_label;
+    mxGPUArray_in0_ = mxGPUCreateFromMxArray(prhs[0]);
+    in0_ = (double *)mxGPUGetDataReadOnly(mxGPUArray_in0_);
+
+    // extract input GPU array pointer
+    if(!(mxIsGPUArray(prhs[1])))
+        mw_err_txt_ = "Invalid array argument, gpuArray expected";
+    if (mw_err_txt_) goto mw_err_label;
+    mxGPUArray_in1_ = mxGPUCreateFromMxArray(prhs[1]);
+    in1_ = (double *)mxGPUGetDataReadOnly(mxGPUArray_in1_);
+
+    // extract input GPU array pointer
+    if(!(mxIsGPUArray(prhs[2])))
+        mw_err_txt_ = "Invalid array argument, gpuArray expected";
+    if (mw_err_txt_) goto mw_err_label;
+    mxGPUArray_in2_ = mxGPUCreateFromMxArray(prhs[2]);
+    in2_ = (double *)mxGPUGetDataReadOnly(mxGPUArray_in2_);
+
+    // extract input GPU array pointer
+    if(!(mxIsGPUArray(prhs[3])))
+        mw_err_txt_ = "Invalid array argument, gpuArray expected";
+    if (mw_err_txt_) goto mw_err_label;
+    mxGPUArray_in3_ = mxGPUCreateFromMxArray(prhs[3]);
+    in3_ = (double *)mxGPUGetDataReadOnly(mxGPUArray_in3_);
+
+    if( mxGetClassID(prhs[4]) != mxDOUBLE_CLASS )
+        mw_err_txt_ = "Invalid scalar argument, mxDOUBLE_CLASS expected";
+    if (mw_err_txt_) goto mw_err_label;
+    in4_ = (int) mxWrapGetScalar(prhs[4], &mw_err_txt_);
+    if (mw_err_txt_)
+        goto mw_err_label;
+
+    if( mxGetClassID(prhs[5]) != mxDOUBLE_CLASS )
+        mw_err_txt_ = "Invalid scalar argument, mxDOUBLE_CLASS expected";
+    if (mw_err_txt_) goto mw_err_label;
+    in5_ = (int) mxWrapGetScalar(prhs[5], &mw_err_txt_);
+    if (mw_err_txt_)
+        goto mw_err_label;
+
+    if (mexprofrecord_)
+        mexprofrecord_[2]++;
+    out0_ = lapslppot_reduce(in0_, in1_, in2_, in3_, in4_, in5_);
+#if MX_HAS_INTERLEAVED_COMPLEX
+    plhs[0] = mxCreateDoubleMatrix(1, 1, mxREAL);
+    *mxGetDoubles(plhs[0]) = out0_;
+#else
+    plhs[0] = mxCreateDoubleMatrix(1, 1, mxREAL);
+    *mxGetPr(plhs[0]) = out0_;
+#endif
+    plhs[1] = mxGPUCreateMxArrayOnGPU(mxGPUArray_in3_);
+
+mw_err_label:
+    if (mxGPUArray_in0_)  mxGPUDestroyGPUArray(mxGPUArray_in0_);
+    if (mxGPUArray_in1_)  mxGPUDestroyGPUArray(mxGPUArray_in1_);
+    if (mxGPUArray_in2_)  mxGPUDestroyGPUArray(mxGPUArray_in2_);
+    if (mxGPUArray_in3_)  mxGPUDestroyGPUArray(mxGPUArray_in3_);
+    if (mw_err_txt_)
+        mexErrMsgTxt(mw_err_txt_);
+}
+
 /* ----
  */
 void mexFunction(int nlhs, mxArray* plhs[],
@@ -1132,12 +1215,14 @@ void mexFunction(int nlhs, mxArray* plhs[],
         mexErrMsgTxt("Identifier should be a string");
     else if (strcmp(id, stubids1_) == 0)
         mexStub1(nlhs,plhs, nrhs-1,prhs+1);
+    else if (strcmp(id, stubids2_) == 0)
+        mexStub2(nlhs,plhs, nrhs-1,prhs+1);
     else if (strcmp(id, "*profile on*") == 0) {
         if (!mexprofrecord_) {
-            mexprofrecord_ = (int*) malloc(2 * sizeof(int));
+            mexprofrecord_ = (int*) malloc(3 * sizeof(int));
             mexLock();
         }
-        memset(mexprofrecord_, 0, 2 * sizeof(int));
+        memset(mexprofrecord_, 0, 3 * sizeof(int));
     } else if (strcmp(id, "*profile off*") == 0) {
         if (mexprofrecord_) {
             free(mexprofrecord_);
@@ -1147,7 +1232,8 @@ void mexFunction(int nlhs, mxArray* plhs[],
     } else if (strcmp(id, "*profile report*") == 0) {
         if (!mexprofrecord_)
             mexPrintf("Profiler inactive\n");
-        mexPrintf("%d calls to utils_cu.mw:26\n", mexprofrecord_[1]);
+        mexPrintf("%d calls to utils_cu.mw:27\n", mexprofrecord_[1]);
+        mexPrintf("%d calls to utils_cu.mw:55\n", mexprofrecord_[2]);
     } else if (strcmp(id, "*profile log*") == 0) {
         FILE* logfp;
         if (nrhs != 2 || mxGetString(prhs[1], id, sizeof(id)) != 0)
@@ -1157,8 +1243,10 @@ void mexFunction(int nlhs, mxArray* plhs[],
             mexErrMsgTxt("Cannot open log for output");
         if (!mexprofrecord_)
             fprintf(logfp, "Profiler inactive\n");
-        fprintf(logfp, "%d calls to utils_cu.mw:26\n", mexprofrecord_[1]);
+        fprintf(logfp, "%d calls to utils_cu.mw:27\n", mexprofrecord_[1]);
+        fprintf(logfp, "%d calls to utils_cu.mw:55\n", mexprofrecord_[2]);
         fclose(logfp);
     } else
         mexErrMsgTxt("Unknown identifier");
 }
+
