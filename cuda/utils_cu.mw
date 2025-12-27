@@ -1,0 +1,32 @@
+% Minimal GPU mwrap interface for Laplace SL potential (toy direct sum).
+% Usage in MATLAB:
+%   y = lapslppot(src, targ, x)
+% where src,targ,x are gpuArray(double) and output y is gpuArray(double).
+
+@function y = lapslppot_wrap(src, targ, x)
+
+  % Basic size checks in MATLAB (mwrap does type checking, not shape logic)
+  if size(src,1) ~= 3
+    error('src must be 3xN (gpuArray double).');
+  end
+  if size(targ,1) ~= 3
+    error('targ must be 3xM (gpuArray double).');
+  end
+  if numel(x) ~= size(src,2)
+    error('x must have length N matching src.');
+  end
+
+  N = int32(size(src,2));
+  M = int32(size(targ,2));
+
+  % Allocate output on GPU (length M)
+  y = gpuArray.zeros(M,1,'double');
+
+  % Call the CUDA entry point in lapslppot.cu
+  # int ier = lapslppot(gpu double[] src, gpu double[] targ, gpu double[] x, gpu inout double[] y, int N, int M);
+
+  if ier ~= 0
+    error('lapslppot failed: ier=%d', ier);
+  end
+
+end
