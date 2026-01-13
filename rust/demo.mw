@@ -1,0 +1,14 @@
+% MWrap file for Rust demo. Generates gateway.c and rust_sin.m
+% Following is augmented MATLAB code, ie there are special lines beginning with
+% the @ and # symbols.
+
+@function y = rust_sin(x)
+% RUST_SIN  minimal Rust demo for MWrap
+%
+% y = rust_sin(x) returns sin(x) computed in Rust.
+
+if ~isvector(x), error('x must be a row or column vector'); end
+N = numel(x);
+
+% Code for calling the Rust function
+# rust_sin(int N, double[N] x, output double[N] y);
