@@ -1,0 +1,19 @@
+% MWrap file for BLIS dgemm demo.
+% Generates gateway.c and cblis_dgemm.m
+
+@function C = cblis_dgemm(A,B)
+% CBLIS_DGEMM  matrix multiply via BLIS dgemm
+%
+
+[mA, kA] = size(A);
+[kB, nB] = size(B);
+m = mA;
+k = kA;
+n = nB;
+mk = m*k;
+kn = k*n;
+mn = m*n;
+
+# mydgemm(int m, int n, int k, double[mk] A, double[kn] B, output double[mn] C);
+C = reshape(C, [mA, nB]);
+end

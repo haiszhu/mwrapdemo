@@ -4,7 +4,7 @@
 # Barnett 8/3/15, tidied 8/26/22.
 
 # Change these if you want to use different compilers:
-CC = gcc-13
+CC = gcc-14
 # CC = /opt/homebrew/opt/llvm/bin/clang
 FC = gfortran
 CFLAGS = -arch arm64
@@ -21,14 +21,18 @@ MEX = /Applications/MATLAB_R20***.app/bin/mex
 # Change this to the location of your MWrap executable,
 # either an absolute path, or a path relative to
 # each of the four demo subdirectories:
-MWRAP = ../../mwrap/mwrap
+MWRAP = ~/mwrap/mwrap
 
 CFLAGS += -I/opt/homebrew/opt/libomp/include
 # CFLAGS += -I/opt/homebrew/opt/llvm/include -fopenmp
 OMPFLAGS = -Xpreprocessor -fopenmp
-OMPLIBS = $(shell ls -d /Applications/MATLAB_R2023b.app)/toolbox/eml/externalDependency/omp/maca64/lib/libomp.dylib
+OMPLIBS = $(shell ls -d /Applications/MATLAB_R2024a.app)/toolbox/eml/externalDependency/omp/maca64/lib/libomp.dylib
 
-MATLABROOT=/Applications/MATLAB_R2023b.app
+BLIS_PREFIX = /opt/homebrew/opt/blis
+BLIS_INC    = $(BLIS_PREFIX)/include
+BLIS_LIB    = $(BLIS_PREFIX)/lib/libblis.a
+
+MATLABROOT=/Applications/MATLAB_R2024a.app
 
 FDIR=$$(dirname `gfortran --print-file-name libgfortran.dylib`)
 MFLAGS += -L${FDIR}

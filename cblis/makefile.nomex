@@ -1,0 +1,22 @@
+# mwrapdemo makefile for interfacing MATLAB to BLIS via C and MWrap (no mex)
+# Follows the no-mex pattern used in ../c2domp and ../f
+include ../make.inc
+
+default: mexfile
+
+# How to compile the BLIS-based C library function:
+lib.o: lib.c makefile.nomex
+	$(CC) -fPIC -O2 $(CFLAGS) -I$(BLIS_INC) -c lib.c
+
+# Tell mwrap to make the interface and the MATLAB wrapper:
+gateway.c: demo.mw makefile.nomex
+	$(MWRAP) -list -mex gateway -mb demo.mw
+	$(MWRAP) -mex gateway -c gateway.c demo.mw
+
+# How to compile the interface without using mex, linking against MATLAB
+# libraries and BLIS. This produces gateway.mexmaca64.
+mexfile: gateway.c lib.o makefile.nomex
+	$(CC) -o $(MEX_LINK) -shared -fPIC -lomp -DMATLAB_MEX_FILE -DMATLAB_DEFAULT_RELEASE=R2018a -I. -include lib.h gateway.c lib.o $(MEX_LIBS) $(BLIS_LIB)
+
+clean:
+	rm -f cblis_dgemm.m gateway.c *.o *.mex* *~
